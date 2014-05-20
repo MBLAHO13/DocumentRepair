@@ -10,16 +10,18 @@ def parseUserFile(parseFunc,fileType) :
 	'''
 	userInput = ''
 	while userInput != 'EXIT' :
-		userInput = raw_input('Please enter a ' fileType ' document to be \
-			parsed and added to the database or "EXIT"\nto quit\n>>> ')
+		userInput = raw_input('Please enter a ' + fileType + ' document to ' + \
+			' be parsed and added to the database or "EXIT"\nto quit\n>>> ')
 		if userInput.endswith(fileType) :
 			try :
 				userFile = open(userInput, 'r')
 			except IOError :
-				print 'Failed to open file. Check to make sure it is in the \
-					current working directory'
+				print 'Failed to open file. Check to make sure it is in the ' + \
+					'current working directory'
 			else :
 				parseFunc(userFile)
+		elif userInput != 'EXIT' :
+			print 'Incorrect file extension'
 
 def fileToDatabase(inputFile) :
 	'''
@@ -27,12 +29,18 @@ def fileToDatabase(inputFile) :
 	parsing and cleaning the input. Throws IOError if file not opened for
 	reading.
 	'''
-	current,fol,folFol = '.'
+	current = fol = folFol = '.'
+	i = 0
 	for word in inputFile.read().split() :
+		word = word.lower().strip(' \t,;:()\'"')
 		current,fol,folFol = fol,folFol,word
 		if not (current == '.' and fol == '.') :
-			db.insert(current,fol,1)
-			db.insert(current,folFol,0)
+			print current, ':', fol, ':', folFol
+			# db.insert(current,fol,1)
+			# db.insert(current,folFol,0)
+			i += 1
+		if i > 200 : # For testing purposes, please ignore
+			break
 		
 				
 def main() :
