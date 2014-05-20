@@ -4,21 +4,37 @@ import socket
 #Connector Library
 import MySQLdb
 
-# getting our ipaddress
-page=urllib2.urlopen('http://www.cs.drexel.edu/~cpb49/ipaddress')
-ipaddress=page.read()
-ipaddress=ipaddress.rstrip()
-page.close()
+def opendb() :
+	# getting our ipaddress
+	page=urllib2.urlopen('http://www.cs.drexel.edu/~cpb49/ipaddress')
+	ipaddress=page.read()
+	ipaddress=ipaddress.rstrip()
+	page.close()
 
-#getting our password
-"""
-piPassword replaces the password in plaintext. DO NOT SUBSTITUTE THE
-PASSWORD INTO THIS FILE! 
-"""
-file=open('password.txt', 'r')
-piPassword=file.read()
-piPassword=piPassword.rstrip()
-file.close()
+	#getting our password
+	'''
+	piPassword replaces the password in plaintext. DO NOT SUBSTITUTE THE
+	PASSWORD INTO THIS FILE! 
+	'''
+	file=open('password.txt', 'r')
+	piPassword=file.read()
+	piPassword=piPassword.rstrip()
+	file.close()
+	
+	#Connecting to the database
+	#s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	#s.connect(("gmail.com",80))
+	#print(s.getsockname()[0])
+	#s.close()
+	#Needs to be changed in order to connect to the raspberry pi
+	db = MySQLdb.connect(host=ipaddress, user="remoteuser", passwd=piPassword, db="engr103");
+	#Execute and test the functions here.
+	delete("and")
+	
+	#close the connection
+	db.close ();
+
+	print ("The connection is closed")
 
 #Displays the table of the word
 def select( word ):
@@ -189,18 +205,3 @@ def delete(mainword, word=""):
    cur.close();
 
    db.commit();
-
-#Connecting to the database
-#s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#s.connect(("gmail.com",80))
-#print(s.getsockname()[0])
-#s.close()
-#Needs to be changed in order to connect to the raspberry pi
-db = MySQLdb.connect(host=ipaddress, user="remoteuser", passwd=piPassword, db="engr103");
-#Execute and test the functions here.
-delete("and")
-
-#close the connection
-db.close ();
-
-print ("The connection is closed")
