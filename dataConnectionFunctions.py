@@ -1,6 +1,5 @@
 import sys
 import urllib2
-<<<<<<< HEAD
 import socket
 #Connector Library
 import MySQLdb
@@ -27,7 +26,6 @@ piPassword=file.read()
 piPassword=piPassword.rstrip()
 file.close()
 import MySQLdb
->>>>>>> 270802e11b7ab088579a23083229ff349c09dd22
 
 #Displays the table of the word
 def select( word ):
