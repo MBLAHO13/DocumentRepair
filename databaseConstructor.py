@@ -1,17 +1,18 @@
 import sys
 import dataConnectionFunctions as db
 
-def parseUserFile(parseFunc,fileType) :
+def parseUserFile(parseFunc,fileType,inputMessage) :
 	'''
 	Requests user input for filename and attepts to open file and parse based
 	on given parsing function. 'parseFunc' is the parsing function which
 	accepts a file object as input and 'fileType' is the chosen filetype to be 
 	parsed as a string of the extension. Example: '.txt'
+	inputMessage is the message to be shown to the user requesting a filename.
+	Function will continue processing documents until the user exits.
 	'''
 	userInput = ''
 	while userInput != 'EXIT' :
-		userInput = raw_input('Please enter a ' + fileType + ' document to ' + \
-			' be parsed and added to the database or "EXIT"\nto quit\n>>> ')
+		userInput = raw_input(inputMessage)
 		if userInput.endswith(fileType) :
 			try :
 				userFile = open(userInput, 'r')
@@ -31,15 +32,20 @@ def fileToDatabase(inputFile) :
 	'''
 	current = fol = folFol = '.'
 	i = 0
-	for word in inputFile.read().split() :
-		word = word.lower().strip(' \t,;:()\'"')
+	# Splitting into words
+	for word in inputFile.read().replace('--',' ').split() :
+		# Cleaning input
+		word = word.lower().strip(' \t,;:()\'"[]')
+		# Ignoring blanks
+		if word == '' :
+			continue
 		current,fol,folFol = fol,folFol,word
 		if not (current == '.' and fol == '.') :
 			print current, ':', fol, ':', folFol
 			# db.insert(current,fol,1)
 			# db.insert(current,folFol,0)
 			i += 1
-		if i > 200 : # For testing purposes, please ignore
+		if i > 200 : # Limiter for testing purposes, please ignore
 			break
 		
 				
@@ -50,7 +56,8 @@ def main() :
 	counted to produce probabilities to be used later by the document
 	repair module.
 	'''
-	parseUserFile(fileToDatabase,'.txt')	
+	parseUserFile(fileToDatabase,'.txt','Please enter a .txt document to ' + \
+			' be parsed and added to the database or "EXIT"\nto quit\n>>> ')
 	return 0
 
 if __name__ == '__main__' :
