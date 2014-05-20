@@ -36,7 +36,6 @@ def fileToDatabase(inputFile) :
 	reading.
 	'''
 	current = fol = twiceFol = '.'
-	i = 0
 	# Splitting into words
 	for word in inputFile.read().replace('--',' ').split() :
 		# Cleaning input
@@ -53,9 +52,6 @@ def fileToDatabase(inputFile) :
 		current,fol,twiceFol = fol,twiceFol,word
 		if not (current == '.' and fol == '.') :
 			addToDB(current,fol,twiceFol)
-			i += 1
-		if i > 200 : # Limiter for testing purposes, please ignore
-			break
 		
 def addToDB(base,fol,twiceFol) :
 	'''
