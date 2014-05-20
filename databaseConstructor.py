@@ -17,6 +17,7 @@ Written for Python 2.7
 
 import sys
 import dataConnectionFunctions as db
+import MySQLdb
 
 def parseFiles(fileExt,mode,inputMessage,parseFunc,*args) :
 	"""Continually requests user input files and processes with parseFunc
@@ -86,8 +87,10 @@ def addToDB(base,fol,twiceFol) :
 def main() :
 	"""Runs fileToDatabase in parseFiles to create a database from .txt files
 	"""
-	parseFiles('.txt','r','Please enter a .txt document to be parsed and ' + \
-		'added to the database or "EXIT"\nto quit\n>>> ',fileToDatabase,5)
+	test = db.opendb()
+	test.close()
+	#parseFiles('.txt','r','Please enter a .txt document to be parsed and ' + \
+	#	'added to the database or "EXIT"\nto quit\n>>> ',fileToDatabase,5)
 	return 0
 
 if __name__ == '__main__' :
