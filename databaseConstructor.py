@@ -66,29 +66,15 @@ def fileToDatabase(inputFile,database) :
 		if word[-1] in ['.','?','!'] :
 			word = word.strip('.?!')
 			current,fol,twiceFol,word = fol,twiceFol,word,'.' # Shifting buffer
-			addToDB(current,fol,twiceFol,database)
+			db.insert(current,fol,twiceFol,database)
 			
 		# Moving buffer and adding to database
 		current,fol,twiceFol = fol,twiceFol,word
 		if not (current == '.' and fol == '.') :
-			addToDB(current,fol,twiceFol,database)
+			db.insert(current,fol,twiceFol,database)
 		i += 1
 		if i > 200 :
 			break
-		
-def addToDB(base,fol,twiceFol,database) :
-	"""Adds word triplet to database using dataConnectionFunctions
-	Function Arguments
-	base: Base word to be used as table name
-	fol: Following word to be added to table
-	twiceFol: Twice following word to be added to table
-	database: Database to add to (in the form of a MySQLdb Connection Object)
-	Function Returns
-	None
-	"""
-#	print base, ':', fol, ':', twiceFol
-	db.insert(base,fol,1,database)
-	db.insert(base,twiceFol,0,database)
 				
 def main() :
 	"""Runs fileToDatabase in parseFiles to create a database from .txt files

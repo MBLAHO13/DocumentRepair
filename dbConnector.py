@@ -56,17 +56,20 @@ def openPidb() :
 	cursor.execute('ALTER DATABASE engr103 CHARACTER SET utf8 COLLATE utf8_general_ci')
 	return db
 	
-def insert(base, word, isFirstFollowing, db) :
+def insert(base, fol, twiceFol, db) :
 	"""Inserts a triple into the base table
 	Function Arguments
 	base: Base word, used as table name
-	word: Word to insert into table
-	isFirstFollowing: Flag. 1 if following, 0 if twice following
+	fol: Following word
+	twiceFol: Twice Following word
 	db: Database to work with
 	Function Return
 	None
 	"""
 	cursor = db.cursor()
+	
+	'''Attempts to create the table. If it fails, that means the table already
+	exists and it moves on'''
 	try :
 		cursor.execute('CREATE TABLE `' + base + '` ( `word` varchar(50), ' + \
 			'`FirstFollowing` int NOT NULL DEFAULT 0, `SecondFollowing` ' + \
@@ -75,54 +78,33 @@ def insert(base, word, isFirstFollowing, db) :
 			'SET utf8 COLLATE utf8_general_ci')
 	except mysql.connector.Error as err :
 		if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
-			print 'Table already exists'
+			pass
 		else:
 			print err.msg
 	
+	'''Attempts to create a new row for fol. If it fails, that means the row 
+	already exists and it moves on'''
 	try :
-		cursor.execute('INSERT INTO `' + base + '` (`word`,`FirstFollowing`,' + \
-			'`SecondFollowing`) VALUES ("' + word + '",0,0);')
-		print cursor.statement
-		print 'Added row'
+		cursor.execute('INSERT INTO `' + base + '` (`word`,`FirstFollowing`' +\
+			',`SecondFollowing`) VALUES ("' + fol + '",0,0);')
 	except mysql.connector.IntegrityError as err :
-		print 'Row already exists'
+		pass
 	
-	cursor.execute('UPDATE `' + base + '` SET FirstFollowing = FirstFollowing + 1 WHERE STRCMP(`word`,"' + word + '") = 0')
+	'''Increments 'fol' row for following count'''
+	cursor.execute('UPDATE `' + base + '` SET FirstFollowing = ' + \
+		'FirstFollowing + 1 WHERE STRCMP(`word`,"' + fol + '") = 0')
+		
+	'''Attempts to create a new row for twiceFol. If it fails, that means the
+	row already exists and it moves on'''
+	try :
+		cursor.execute('INSERT INTO `' + base + '` (`word`,`FirstFollowing`' +\
+			',`SecondFollowing`) VALUES ("' + twiceFol + '",0,0);')
+	except mysql.connector.IntegrityError as err :
+		pass
+	
+	'''Increments row for following or twice following count'''
+	cursor.execute('UPDATE `' + base + '` SET SecondFollowing = ' + \
+		'SecondFollowing + 1 WHERE STRCMP(`word`,"' + twiceFol + '") = 0')
+	
 	db.commit()
 	cursor.close()
-	
-	'''
-	cur = db.cursor();
-	field=0;
-
-	#Check if table exists, if it doesnt create the specified table.
-	if not isTable(mainword,db):
-		cur1.execute("Creat table _"+mainword+"(Word varchar(50), FirstFollowing int NOT null default 0, SecondFollowing int NOT NULL default 0)")
-	
-	cur1.execute("SELECT COUNT(*) FROM _"+mainword+" where Word=\""+word+"\"")
-
-	for row in cur1.fetchall() :
-		#data from rows
-		 for i in range (0, len(row)) :
-		  field = str(row[i]);
-	
-	if field!=0: 
-		if isFirstFollowing:
-			cur3.execute("UPDATE _"+mainword+" SET FirstFollowing=FirstFollowing+1 WHERE word=\""+word+"\"")
-			print ("Update Statement Executed");
-		else:
-			cur3.execute("UPDATE _"+mainword+" SET SecondFollowing=SecondFollowing+1 WHERE word=\""+word+"\"")
-			print ("Update Statement Executed");
-	else:
-		if isFirstFollowing:
-			cur3.execute("INSERT into _"+mainword+" values(\""+word+"\", 1, 0)");
-			print ("Insert Statement Executed");
-		else:
-			cur3.execute("INSERT into _"+mainword+" values(\""+word+"\", 0, 1)");
-			print ("Insert Statement Executed");
-	# close the cursor
-	cur1.close();
-	cur2.close();
-	cur3.close();
-	db.commit();
-	'''
