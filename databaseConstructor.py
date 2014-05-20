@@ -44,10 +44,11 @@ def parseFiles(fileExt,mode,inputMessage,parseFunc,*args) :
 		elif userInput != 'EXIT' :
 			print 'Incorrect file extension'
 
-def fileToDatabase(inputFile) :
+def fileToDatabase(inputFile,database) :
 	"""Builds database of word triplets from file object
 	Function Arguments
 	inputFile: File object to read from
+	database: Database to add to (in the form of a MySQLdb Connection Object)
 	Function Returns
 	None
 	"""
@@ -64,33 +65,34 @@ def fileToDatabase(inputFile) :
 		if word[-1] in ['.','?','!'] :
 			word = word.strip('.?!')
 			current,fol,twiceFol,word = fol,twiceFol,word,'.' # Shifting buffer
-			addToDB(current,fol,twiceFol)
+			addToDB(current,fol,twiceFol,database)
 			
 		# Moving buffer and adding to database
 		current,fol,twiceFol = fol,twiceFol,word
 		if not (current == '.' and fol == '.') :
-			addToDB(current,fol,twiceFol)
+			addToDB(current,fol,twiceFol,database)
 		
-def addToDB(base,fol,twiceFol) :
+def addToDB(base,fol,twiceFol,database) :
 	"""Adds word triplet to database using dataConnectionFunctions
 	Function Arguments
 	base: Base word to be used as table name
 	fol: Following word to be added to table
 	twiceFol: Twice following word to be added to table
+	database: Database to add to (in the form of a MySQLdb Connection Object)
 	Function Returns
 	None
 	"""
 	print base, ':', fol, ':', twiceFol
-	# db.insert(base,fol,1)
-	# db.insert(base,twiceFol,0)
+	db.insert(base,fol,1,database)
+	db.insert(base,twiceFol,0,database)
 				
 def main() :
 	"""Runs fileToDatabase in parseFiles to create a database from .txt files
 	"""
-	test = db.opendb()
-	test.close()
-	#parseFiles('.txt','r','Please enter a .txt document to be parsed and ' + \
-	#	'added to the database or "EXIT"\nto quit\n>>> ',fileToDatabase,5)
+	probabilitydb = db.openPidb()
+	parseFiles('.txt','r','Please enter a .txt document to be parsed and ' + \
+		'added to the database or "EXIT"\nto quit\n>>> ',fileToDatabase,probabilitydb)
+	probabilitydb.close()
 	return 0
 
 if __name__ == '__main__' :
