@@ -4,11 +4,6 @@ import socket
 #Connector Library
 import MySQLdb
 
-#importing ip address of the Raspberry Pi
-page=urllib2.urlopen('http://www.cs.drexel.edu/~cpb49/ipaddress')
-ipaddress=page.read()
-ipaddress=ipaddress.rstrip()
-=======
 # getting our ipaddress
 page=urllib2.urlopen('http://www.cs.drexel.edu/~cpb49/ipaddress')
 ipaddress=page.read()
@@ -16,7 +11,6 @@ ipaddress=ipaddress.rstrip()
 page.close()
 
 #getting our password
-
 """
 piPassword replaces the password in plaintext. DO NOT SUBSTITUTE THE
 PASSWORD INTO THIS FILE! 
@@ -25,7 +19,6 @@ file=open('password.txt', 'r')
 piPassword=file.read()
 piPassword=piPassword.rstrip()
 file.close()
-import MySQLdb
 
 #Displays the table of the word
 def select( word ):
