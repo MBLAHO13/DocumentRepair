@@ -27,6 +27,8 @@ def parseFiles(fileExt,mode,inputMessage,parseFunc,*args) :
 	parseFunc: Function to be run on opened files. Must accept file object as
 	input.
 	*args: Arguments to be pased to parseFunc after the file object.
+	Function Returns
+	None
 	"""
 	userInput = ''
 	while userInput != 'EXIT' :
@@ -45,6 +47,8 @@ def fileToDatabase(inputFile) :
 	"""Builds database of word triplets from file object
 	Function Arguments
 	inputFile: File object to read from
+	Function Returns
+	None
 	"""
 	current = fol = twiceFol = '.'
 	# Splitting into words
@@ -72,6 +76,8 @@ def addToDB(base,fol,twiceFol) :
 	base: Base word to be used as table name
 	fol: Following word to be added to table
 	twiceFol: Twice following word to be added to table
+	Function Returns
+	None
 	"""
 	print base, ':', fol, ':', twiceFol
 	# db.insert(base,fol,1)
