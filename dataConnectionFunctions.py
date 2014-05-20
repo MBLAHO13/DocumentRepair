@@ -36,62 +36,62 @@ def getPassword() :
 	Function Returns
 	Password as string
 	"""
-	'''
-	pw replaces the password in plaintext. DO NOT SUBSTITUTE THE
-	PASSWORD INTO THIS FILE! 
-	'''
 	with open('password.txt','r') as file :
 		pw = file.read().strip()
 	return pw
 	
-def opendb() :
+def openPidb() :
 	"""Opens database on Raspberri Pi for use
 	Function Arguments
 	None
 	Function Returns
-	MySQLdb object
+	MySQLdb Connection Object
 	"""
 	ip = getIP()
 	password = getPassword()
 	return MySQLdb.connect(ip,'remoteaccess',password,'engr103')
 
-def select( word ):
-	#create a cursor for the select
+def select(word,db) :
+	"""Prints the base word's table from the database
+	Function Arguments
+	word: Base word chosen to print out
+	db: Database to pull word from (in the form of a MySQLdb Connection Object)
+	Function Returns
+	None
+	"""
 	cur = db.cursor();
-
-	#execute an sql query
-	cur.execute("SELECT * FROM _"+word);
-
-	#Iterate 
+	cur.execute("SELECT * FROM _" + word);
 	for row in cur.fetchall() :
-		for i in range (0, len(row)) :
+		print field in row
+	'''	for i in range (0, len(row)) :
 			field = str(row[i]);
-			print (field);
-
-	# close the cursor
+			print (field);'''
 	cur.close();
-
-	print ("Display Sucessfull");
 
 #Checks if a table exists, returns true if it doesnt and
 #returns false if it does.
-def isNotTable(word):
+def isTable(word,db):
+	"""Checks the existence of a table in the database
+	Function Arguments
+	word: Base word table to be searched for
+	db: Database to be searched
+	Function Returns
+	Returns true if table exists, false otherwise.
+	"""
 	cur = db.cursor();
-	field=0;
-	cur.execute("SELECT COUNT(*)FROM information_schema.tables WHERE table_schema = 'engr103' AND table_name = '_"+word+"'")
+	count = 0;
+	cur.execute("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'engr103' AND table_name = '_"+word+"'")
 	for row in cur.fetchall() :
-		 #data from rows
-		 for i in range (0, len(row)) :
-		  field = str(row[i]);
+		for field in row :
+			count = field[i];
 	cur.close();
-	field=int(field)
-	if field==0:
-		return 1;
+	if count == 0:
+		return False;
 	else:
-		return 0;
+		return True;
 	
 #Insert function for a table of mainword with  
-def insert( mainword, word, isFirstFollowing=1):
+def insert( mainword, word, isFirstFollowing, db):
 
 	#create mutiple cursors to prevent overlapping queries
 	cur1 = db.cursor();
@@ -100,7 +100,7 @@ def insert( mainword, word, isFirstFollowing=1):
 	field=0;
 
 	#Check if table exists, if it doesnt create the specified table.
-	if isNotTable(mainword):
+	if not isTable(mainword,db):
 		cur1.execute("Creat table _"+mainword+"(Word varchar(50), FirstFollowing int NOT null default 0, SecondFollowing int NOT NULL default 0)")
 	
 	cur1.execute("SELECT COUNT(*) FROM _"+mainword+" where Word=\""+word+"\"")
@@ -194,7 +194,7 @@ def delete(mainword, word=""):
 	#create a cursor for the select
 	cur = db.cursor();
 
-	if isNotTable(mainword):
+	if not isTable(mainword):
 		print("Table _"+mainword+" doesn't exist")
 	
 	#check for the default value of word
