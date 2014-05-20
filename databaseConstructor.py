@@ -1,3 +1,8 @@
+# Database Constructor
+# 
+# Max Mattes
+# 05/20/2014
+
 import sys
 import dataConnectionFunctions as db
 
@@ -30,7 +35,7 @@ def fileToDatabase(inputFile) :
 	parsing and cleaning the input. Throws IOError if file not opened for
 	reading.
 	'''
-	current = fol = folFol = '.'
+	current = fol = twiceFol = '.'
 	i = 0
 	# Splitting into words
 	for word in inputFile.read().replace('--',' ').split() :
@@ -39,15 +44,26 @@ def fileToDatabase(inputFile) :
 		# Ignoring blanks
 		if word == '' :
 			continue
-		current,fol,folFol = fol,folFol,word
+		# Establishing punctuation as separate 'word' in database
+		if word[len(word)-1] in ['.','?','!'] :
+			word = word.strip('.?!')
+			current,fol,twiceFol,word = fol,twiceFol,word,'.'
+			addToDB(current,fol,twiceFol)
+		# Moving buffer and adding to database
+		current,fol,twiceFol = fol,twiceFol,word
 		if not (current == '.' and fol == '.') :
-			print current, ':', fol, ':', folFol
-			# db.insert(current,fol,1)
-			# db.insert(current,folFol,0)
+			addToDB(current,fol,twiceFol)
 			i += 1
 		if i > 200 : # Limiter for testing purposes, please ignore
 			break
 		
+def addToDB(base,fol,twiceFol) :
+	'''
+	Adds word triplet to database using dataConnectionFunctions
+	'''
+	print base, ':', fol, ':', twiceFol
+	# db.insert(base,fol,1)
+	# db.insert(base,twiceFol,0)
 				
 def main() :
 	'''
