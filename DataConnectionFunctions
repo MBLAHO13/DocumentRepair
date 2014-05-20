@@ -1,0 +1,74 @@
+#!/usr/bin/python
+# dataTestPython.py 
+# a simple script to test connection with MySQL
+
+
+import sys
+import urllib2
+page=urllib2.urlopen('http://www.cs.drexel.edu/~cpb49/ipaddress')
+ipaddress=page.read()
+ipaddress=ipaddress.rstrip()
+import MySQLdb
+
+def select( word ):
+
+   #create a cursor for the select
+   cur = db.cursor();
+
+   #execute an sql query
+   cur.execute("SELECT * FROM "+word);
+
+   ##Iterate 
+   for row in cur.fetchall() :
+      #data from rows
+       for i in range (0, len(row)) :
+        field = str(row[i]);
+
+      #print 
+        print (field);
+
+   # close the cursor
+   cur.close();
+
+   print ("Display Sucessfull");
+   
+def insert( mainword, word, following):
+
+   #create a cursor for the select
+   cur = db.cursor();
+
+   #execute an sql query
+   if ( exist (cur.execute("select * from "+mainword+" where word ="+word)) ): 
+   
+      cur.execute("UPDATE "+mainword+" SET FirstFollowing=FirstFollowing+1 WHERE word="+word)
+      print ("Update Statement Executed");
+   else:
+      
+      cur.execute("INSERT into "+tableName+" values("+word+", 1, 1)");
+      print ("Insert Statement Executed");
+
+   # close the cursor
+   cur.close();
+   commitCheck=input("Please enter commit if you wish to commit the changes");
+   if (commitCheck=="commit"):
+      db.commit();
+
+def total(word):
+
+   #create a cursor for the select
+   cur = db.cursor();
+
+   #execute an sql query
+   cur.execute("SELECT SUM(FirstFollowing) FROM _"+word);
+   print ("Total Statement Executed");
+
+   # close the cursor
+   cur.close();
+
+#Connecting to the database
+db = MySQLdb.connect(host="localhost", user="root", passwd="Venus123321", db="engr103");
+
+#close the connection
+#db.close ();
+
+print ("The connection is closed")

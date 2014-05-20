@@ -1,0 +1,15 @@
+#!/bin/bash
+
+myip=$(hostname -I)
+
+echo $myip
+
+ssh -o StrictHostKeyChecking=no cpb49@tux.cs.drexel.edu "echo $myip >| ~/public_html/ipaddress"
+
+if [ "$?" -ne  0 ];
+then
+	python /home/pi/emailIP.py
+	echo "TUX IS DOOOOOOWN" >> iplog
+fi
+
+exit 0
