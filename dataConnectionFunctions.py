@@ -1,3 +1,16 @@
+"""Python to SQL connector
+Interfaces between python and a remote SQL database and has functions to work
+in conjunction with databaseConstructor and documentRepair for creating and
+maintaining the database.
+
+Max Mattes, Karishma Changlani, Colleen Blaho
+05/20/2014
+
+Changelog located on GitHub: https://github.com/CBLAHO13/DocumentRepair/
+
+Written for Python 2.7
+"""
+
 import sys
 import urllib2
 import socket

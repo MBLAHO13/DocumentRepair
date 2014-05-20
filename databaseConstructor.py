@@ -10,6 +10,8 @@ after that, referred to internally as "twice following"
 Max Mattes, Karishma Changlani, Colleen Blaho
 05/20/2014
 
+Changelog located on GitHub: https://github.com/CBLAHO13/DocumentRepair/
+
 Written for Python 2.7
 """
 
