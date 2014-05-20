@@ -16,8 +16,8 @@ Written for Python 2.7
 """
 
 import sys
-import dataConnectionFunctions as db
-import MySQLdb
+import dbConnector as db
+import mysql.connector
 
 def parseFiles(fileExt,mode,inputMessage,parseFunc,*args) :
 	"""Continually requests user input files and processes with parseFunc
@@ -54,6 +54,7 @@ def fileToDatabase(inputFile,database) :
 	"""
 	current = fol = twiceFol = '.'
 	# Splitting into words
+	i = 0
 	for word in inputFile.read().replace('--',' ').split() :
 		# Cleaning input
 		word = word.lower().strip(' \t,;:()\'"[]')
@@ -71,6 +72,9 @@ def fileToDatabase(inputFile,database) :
 		current,fol,twiceFol = fol,twiceFol,word
 		if not (current == '.' and fol == '.') :
 			addToDB(current,fol,twiceFol,database)
+		i += 1
+		if i > 200 :
+			break
 		
 def addToDB(base,fol,twiceFol,database) :
 	"""Adds word triplet to database using dataConnectionFunctions
@@ -82,7 +86,7 @@ def addToDB(base,fol,twiceFol,database) :
 	Function Returns
 	None
 	"""
-	print base, ':', fol, ':', twiceFol
+#	print base, ':', fol, ':', twiceFol
 	db.insert(base,fol,1,database)
 	db.insert(base,twiceFol,0,database)
 				
