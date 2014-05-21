@@ -19,7 +19,7 @@ import sys
 import dbConnector as db
 import mysql.connector
 
-def parseFiles(fileExt,mode,inputMessage,parseFunc,*args) :
+def parseFiles(fileExt, mode, inputMessage, parseFunc, *args) :
 	"""Continually requests user input files and processes with parseFunc
 	Function Arguments
 	fileExt: Extension for file to be parsed
@@ -44,7 +44,7 @@ def parseFiles(fileExt,mode,inputMessage,parseFunc,*args) :
 		elif userInput != 'EXIT' :
 			print 'Incorrect file extension'
 
-def fileToDatabase(inputFile,database) :
+def fileToDatabase(inputFile, database) :
 	"""Builds database of word triplets from file object
 	Function Arguments
 	inputFile: File object to read from
@@ -55,6 +55,7 @@ def fileToDatabase(inputFile,database) :
 	current = fol = twiceFol = '.'
 	# Splitting into words
 	i = 0
+	print 'Inserting words from ' + inputFile.name + '...'
 	for word in inputFile.read().replace('--',' ').split() :
 		# Cleaning input
 		word = word.lower().strip(' \t,;:()\'"[]')
@@ -79,7 +80,7 @@ def fileToDatabase(inputFile,database) :
 def main() :
 	"""Runs fileToDatabase in parseFiles to create a database from .txt files
 	"""
-	probabilitydb = db.openPidb()
+	probabilitydb = db.openPidb('testDB')
 	parseFiles('.txt','r','Please enter a .txt document to be parsed and ' + \
 		'added to the database or "EXIT"\nto quit\n>>> ',fileToDatabase,probabilitydb)
 	probabilitydb.close()

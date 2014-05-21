@@ -42,18 +42,24 @@ def getPassword() :
 		pw = file.read().strip()
 	return pw
 	
-def openPidb() :
+def openPidb(dbName) :
 	"""Opens database on Raspberri Pi for use
 	Function Arguments
-	None
+	dbName: Name of the database to be created
 	Function Returns
 	MySQLdb Connection Object
 	"""
 	db = mysql.connector.connect(user='remoteaccess',password=getPassword(),
-		database='engr103',host=getIP())
+		host=getIP())
 	cursor = db.cursor()
-	cursor.execute('SET collation_connection = \'utf8_general_ci\'')
-	cursor.execute('ALTER DATABASE engr103 CHARACTER SET utf8 COLLATE utf8_general_ci')
+	try :
+		cursor.execute('CREATE DATABASE `' + dbName + '`;')
+	except mysql.connector.errors.DatabaseError :
+		pass
+	cursor.execute('USE `' + dbName + '`;')
+	cursor.execute('SET collation_connection = \'utf8_general_ci\';')
+	cursor.execute('ALTER DATABASE `' + dbName + '` CHARACTER SET utf8 COLLATE utf8_general_ci;')
+		
 	return db
 	
 def insert(base, fol, twiceFol, db) :
@@ -75,7 +81,7 @@ def insert(base, fol, twiceFol, db) :
 			'`FirstFollowing` int NOT NULL DEFAULT 0, `SecondFollowing` ' + \
 			'int NOT NULL DEFAULT 0, PRIMARY KEY (`word`));')
 		cursor.execute('ALTER TABLE `' + base + '` CONVERT TO CHARACTER ' + \
-			'SET utf8 COLLATE utf8_general_ci')
+			'SET utf8 COLLATE utf8_general_ci;')
 	except mysql.connector.Error as err :
 		if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
 			pass
@@ -92,7 +98,7 @@ def insert(base, fol, twiceFol, db) :
 	
 	'''Increments 'fol' row for following count'''
 	cursor.execute('UPDATE `' + base + '` SET FirstFollowing = ' + \
-		'FirstFollowing + 1 WHERE STRCMP(`word`,"' + fol + '") = 0')
+		'FirstFollowing + 1 WHERE STRCMP(`word`,"' + fol + '") = 0;')
 		
 	'''Attempts to create a new row for twiceFol. If it fails, that means the
 	row already exists and it moves on'''
@@ -104,7 +110,29 @@ def insert(base, fol, twiceFol, db) :
 	
 	'''Increments row for following or twice following count'''
 	cursor.execute('UPDATE `' + base + '` SET SecondFollowing = ' + \
-		'SecondFollowing + 1 WHERE STRCMP(`word`,"' + twiceFol + '") = 0')
+		'SecondFollowing + 1 WHERE STRCMP(`word`,"' + twiceFol + '") = 0;')
 	
 	db.commit()
 	cursor.close()
+	
+def getDict(base, order, db) :
+	"""Chooses one column in base table and converts to dict with words as keys
+	Function Arguments
+	base: Base word, used as table name
+	order: Following, Twice Following, etc. int to show distance from base
+	db: Database to work with
+	"""
+	cursor = db.cursor()
+	wordMap = {}
+	cursor.execute('DESCRIBE `' + base + '`;')
+	i = 0
+	for item in cursor :
+		if i == order :
+			column = str(item[0])
+		i += 1
+	cursor.execute('SELECT `word`,`' + column + '` FROM `' + base + '`;')
+	for (word, count) in cursor :
+		if count > 0 :
+			wordMap[word] = count
+	cursor.close()
+	return wordMap
