@@ -12,6 +12,7 @@ Changelog located on GitHub: https://github.com/CBLAHO13/DocumentRepair/
 
 Written for Python 2.7
 """
+
 import sys
 import urllib2
 import mysql.connector
@@ -65,6 +66,18 @@ def openPidb(dbName) :
 	cursor.execute('SET collation_connection = \'utf8_general_ci\';')
 	cursor.execute('ALTER DATABASE `' + dbName + '` CHARACTER SET utf8 COLLATE utf8_general_ci;')
 	return db
+
+def isTable(base, db):
+   cursor = db.cursor();
+   field=0;
+   cursor.execute('SELECT COUNT(*)FROM information_schema.tables WHERE table_schema = "'+db+'" AND table_name = "`'+base+'`' )
+   for row in cursor.fetchall():
+        field = str(row[0]);
+   cursor.close();
+   if field==0:
+      return False;
+   else:
+      return True;
 	
 def insert(base, fol, twiceFol, db) :
 	"""
@@ -83,9 +96,10 @@ def insert(base, fol, twiceFol, db) :
 	'''Attempts to create the table. If it fails, that means the table already
 	exists and it moves on'''
 	try :
-		cursor.execute('CREATE TABLE `' + base + '` ( `word` varchar(50), ' + \
-			'`FirstFollowing` int NOT NULL DEFAULT 0, `SecondFollowing` ' + \
-			'int NOT NULL DEFAULT 0, PRIMARY KEY (`word`));')
+                if not isTable(base):
+                        cursor.execute('CREATE TABLE `' + base + '` ( `word` varchar(50), ' + \
+                                '`FirstFollowing` int NOT NULL DEFAULT 0, `SecondFollowing` ' + \
+                                'int NOT NULL DEFAULT 0, PRIMARY KEY (`word`));')
 		cursor.execute('ALTER TABLE `' + base + '` CONVERT TO CHARACTER ' + \
 			'SET utf8 COLLATE utf8_general_ci;')
 	except mysql.connector.Error as err :
