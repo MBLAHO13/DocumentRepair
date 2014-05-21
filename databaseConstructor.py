@@ -14,7 +14,6 @@ Changelog located on GitHub: https://github.com/CBLAHO13/DocumentRepair/
 
 Written for Python 2.7
 """
-
 import sys
 import dbConnector as db
 import mysql.connector
@@ -32,16 +31,16 @@ def parseFiles(fileExt, mode, inputMessage, parseFunc, *args) :
 	None
 	"""
 	userInput = ''
-	while userInput != 'EXIT' :
+	while userInput not in ('EXIT','CONTINUE') :
 		userInput = raw_input(inputMessage)
 		if userInput.endswith(fileExt) :
 			try :
 				 with open(userInput,mode) as userFile :
 					parseFunc(userFile,*args)
 			except IOError :
-				print 'Failed to open file correctly. Check to make sure it' +\
-					' is in the current working directory'
-		elif userInput != 'EXIT' :
+				print 'Failed to open file correctly. Check to make sure ' + \
+					'it is in the current working directory'
+		elif userInput not in ('EXIT','CONTINUE') :
 			print 'Incorrect file extension'
 
 def fileToDatabase(inputFile, database) :
@@ -82,7 +81,8 @@ def main() :
 	"""
 	probabilitydb = db.openPidb('testDB')
 	parseFiles('.txt','r','Please enter a .txt document to be parsed and ' + \
-		'added to the database or "EXIT"\nto quit\n>>> ',fileToDatabase,probabilitydb)
+		'added to the database or "EXIT"\nto quit\n>>> ',fileToDatabase,
+		probabilitydb)
 	probabilitydb.close()
 	return 0
 

@@ -12,7 +12,6 @@ Changelog located on GitHub: https://github.com/CBLAHO13/DocumentRepair/
 
 Written for Python 2.7
 """
-
 import sys
 import urllib2
 import mysql.connector
@@ -130,12 +129,24 @@ def getDict(base, order, db) :
 		if i == order :
 			column = str(item[0])
 		i += 1
-	cursor.execute('SELECT SUM(`' + column + '`) FROM `' + base + '`;')
-	for word in cursor :
-		totalCount = word[0]
+	totalCount = getTotal(base, order, db)
 	cursor.execute('SELECT `word`,`' + column + '` FROM `' + base + '`;')
 	for (word, count) in cursor :
 		if count > 0 :
 			wordMap[word] = float(count)/float(totalCount)
 	cursor.close()
 	return wordMap
+	
+def getTotal(base, order, db) :
+	"""Returns the total count from a column in the table
+	Function Arguments
+	base: Base word, used as table name
+	order: Following, Twice Following, etc. int to show distance from base
+	db: Database to work with
+	"""
+	cursor = db.cursor()
+	cursor.execute('SELECT SUM(`' + column + '`) FROM `' + base + '`;')
+	for word in cursor :
+		total = word[0]
+	cursor.close()
+		return total
