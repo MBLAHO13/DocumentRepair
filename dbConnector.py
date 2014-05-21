@@ -88,6 +88,18 @@ def isTable(base, db) :
 	else:
 		return True;
 	
+def isRow(base, word, db):
+    cursor=db.cursor()
+    field=0;
+    cursor.execute('SELECT COUNT(*) FROM `'+base+'` where Word="'+word+'"')
+
+    for row in cursor.fetchall() :
+       field = row[0];
+    if field==0:
+                   return False;
+    else:
+                   return True;
+	
 def insert(base, fol, twiceFol, db) :
 	"""
 	Insert a triple into the base table
