@@ -60,24 +60,33 @@ def openPidb(dbName) :
 	cursor = db.cursor()
 	try :
 		cursor.execute('CREATE DATABASE `' + dbName + '`;')
+		cursor.execute('SET collation_connection = \'utf8_general_ci\';')
+		cursor.execute('ALTER DATABASE `' + dbName + '` CHARACTER SET utf8 COLLATE utf8_general_ci;')
 	except mysql.connector.errors.DatabaseError :
 		pass
 	cursor.execute('USE `' + dbName + '`;')
-	cursor.execute('SET collation_connection = \'utf8_general_ci\';')
-	cursor.execute('ALTER DATABASE `' + dbName + '` CHARACTER SET utf8 COLLATE utf8_general_ci;')
 	return db
 
-def isTable(base, db):
-   cursor = db.cursor();
-   field=0;
-   cursor.execute('SELECT COUNT(*)FROM information_schema.tables WHERE table_schema = "'+db+'" AND table_name = "`'+base+'`' )
-   for row in cursor.fetchall():
-        field = str(row[0]);
-   cursor.close();
-   if field==0:
-      return False;
-   else:
-      return True;
+def isTable(base, db) :
+	"""
+	Checks if a base table already exists in the database
+	
+	Args:
+		base: Base word, used as table name
+		db: Database of word counts
+	Returns:
+		False if table does not exist, True otherwise
+	"""
+	cursor = db.cursor();
+	field=0;
+	cursor.execute('SELECT COUNT(*)FROM information_schema.tables WHERE table_schema = "' + str(db.database) + '" AND table_name = "'+base+'"' )
+	for row in cursor.fetchall():
+		field = str(row[0]);
+	cursor.close();
+	if field==0:
+		return False;
+	else:
+		return True;
 	
 def insert(base, fol, twiceFol, db) :
 	"""
@@ -93,20 +102,11 @@ def insert(base, fol, twiceFol, db) :
 	"""
 	cursor = db.cursor()
 	
-	'''Attempts to create the table. If it fails, that means the table already
-	exists and it moves on'''
-	try :
-                if not isTable(base):
-                        cursor.execute('CREATE TABLE `' + base + '` ( `word` varchar(50), ' + \
-                                '`FirstFollowing` int NOT NULL DEFAULT 0, `SecondFollowing` ' + \
-                                'int NOT NULL DEFAULT 0, PRIMARY KEY (`word`));')
-		cursor.execute('ALTER TABLE `' + base + '` CONVERT TO CHARACTER ' + \
-			'SET utf8 COLLATE utf8_general_ci;')
-	except mysql.connector.Error as err :
-		if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
-			pass
-		else:
-			print err.msg
+	# Creates table if it does not already exist
+	if not isTable(base, db):
+		cursor.execute('CREATE TABLE `' + base + '` ( `word` varchar(50), ' + \
+			'`FirstFollowing` int NOT NULL DEFAULT 0, `SecondFollowing` ' + \
+			'int NOT NULL DEFAULT 0, PRIMARY KEY (`word`));')
 	
 	'''Attempts to create a new row for fol. If it fails, that means the row 
 	already exists and it moves on'''
