@@ -149,4 +149,4 @@ def getTotal(base, order, db) :
 	for word in cursor :
 		total = word[0]
 	cursor.close()
-		return total
+	return total

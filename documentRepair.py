@@ -35,7 +35,7 @@ def userSelectOn() :
 				'chooses which word to insert'
 	if choice in ['0','repair'] :
 		return False
-	else
+	else :
 		return True
 
 def repair(doc, database) :
@@ -48,7 +48,7 @@ def repair(doc, database) :
 	"""
 	userSelect = userSelectOn()
 	with open(doc.name + '~repaired','w') as fixedDoc :
-		delim = raw_input('Enter a string to represent a missing word\n>>> ')
+		delim = '...#' # raw_input('Enter a string to represent a missing word\n>>> ')
 		wordQueue = deque('.'*5)
 		for word in inputFile.read().replace('--',' ').split() :
 			# Cleaning input
@@ -72,7 +72,7 @@ def repair(doc, database) :
 		while len(wordQueue) > 0 :
 			fixedDoc.write(wordQueue.popleft())
 			
-def replaceWord(wordList, database, userSelect)
+def replaceWord(wordList, database, userSelect) :
 	"""Replaces a missing word by probaility or by selection from probable list
 	Function Arugments
 	wordList: Queue of 5 words including missing word
@@ -88,7 +88,7 @@ def replaceWord(wordList, database, userSelect)
 	chosenWord = sortedProbabilities[0][1]
 	if userSelect :
 		print '{1:15s} {2:15s}'.format('Word','Probability')
-		for i in range(20)
+		for i in range(20) :
 			print '{1:15s} {2:.3f}%'.format(sortedProbabilities[i][1],sortedProbabilities[i][0]*float(25))
 		print 'Current line: ', wordList
 		chosenWord = raw_input('Select a word from the list or input your ' + \
@@ -110,7 +110,7 @@ def getLeftProbability(wordList, database) :
 			probableDict[word] = secondDict[word]
 	return probableDict
 	
-def getRightProbability(wordList,probableTable,database)
+def getRightProbability(wordList,probableTable,database) :
 	"""Still too tired for documentation. The name of this thing explains itself. Seriously.
 	"""
 	for word in probableTable :

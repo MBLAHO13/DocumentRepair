@@ -53,7 +53,7 @@ def fileToDatabase(inputFile, database) :
 	"""
 	current = fol = twiceFol = '.'
 	# Splitting into words
-	i = 0
+	# i = 0 # TEST CODE PLEASE IGNORE
 	print 'Inserting words from ' + inputFile.name + '...'
 	for word in inputFile.read().replace('--',' ').split() :
 		# Cleaning input
@@ -72,9 +72,9 @@ def fileToDatabase(inputFile, database) :
 		current,fol,twiceFol = fol,twiceFol,word
 		if not (current == '.' and fol == '.') :
 			db.insert(current,fol,twiceFol,database)
-		i += 1
-		if i > 200 :
-			break
+		'''i += 1
+		if i > 200 : # TEST CODE PLEASE IGNORE
+			break'''
 				
 def main() :
 	"""Runs fileToDatabase in parseFiles to create a database from .txt files
