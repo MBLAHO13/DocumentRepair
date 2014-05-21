@@ -1,4 +1,5 @@
-"""Document Repair
+"""
+Document Repair
 Uses the database of triples created by databaseConstructor and dbConnector to
 predict words missing from input documents deliniated by user-chosen delimiter
 The user is given a choice between outputting a table of likely words to the 
@@ -18,11 +19,13 @@ import mysql.connector
 from collections import deque
 
 def userSelectOn() :
-	"""Gives user a choce of repair modes
-	Function Arguments
-	None
-	Function Returns
-	bool: true if tables should be shown, false otherwise
+	"""
+	Give user a choce of repair modes
+	
+	Args:
+		None
+	Returns:
+		True if tables should be shown, false otherwise
 	"""
 	choice = ''
 	while choice not in ['0','1','repair','list'] :
@@ -39,12 +42,14 @@ def userSelectOn() :
 		return True
 
 def repair(doc, database) :
-	"""Repairs a document using probabilities stored in the database
-	Function Arguments
-	doc: Document to be repaired
-	database: Database with probaility tables
-	Function Returns
-	File output, but no function returns
+	"""
+	Repair a document using probabilities stored in the database
+	
+	Args:
+		doc: Document to be repaired
+		database: Database of word counts
+	Returns:
+		File output, but no function returns
 	"""
 	userSelect = userSelectOn()
 	with open(doc.name + '~repaired','w') as fixedDoc :
@@ -74,12 +79,14 @@ def repair(doc, database) :
 			fixedDoc.write(wordQueue.popleft())
 			
 def replaceWord(wordList, database, userSelect) :
-	"""Replaces a missing word by probaility or by selection from probable list
-	Function Arugments
-	wordList: Queue of 5 words including missing word
-	database: Database of probabilities to work with
-	Function Return
-	string: returns chosen string to replace missing word
+	"""
+	Replace a missing word by probaility or by selection from probable list
+	
+	Args:
+		wordList: Queue of 5 words including missing word
+		database: Database of word counts
+	Returns:
+		string: returns chosen string to replace missing word
 	"""
 	probableTable = getLeftProbability(wordList[:2],database)
 	probableTable = getRightProbability(wordList[3:],probableTable,database)
@@ -97,7 +104,15 @@ def replaceWord(wordList, database, userSelect) :
 	return chosenWord
 		
 def getLeftProbability(wordList, database) :
-	"""Does some shit i'm too tired for documenting right now
+	"""
+	Get probability table summed from two words left of missing word
+	
+	Args:
+		wordList: 2-word deque of words left of missing word
+		database: Database of word counts
+	Returns:
+		Dict of word,probability pairs (where probability is the summed counts
+			from the two words in wordList)
 	"""
 	firstDict = db.getDict(wordList[0],2,database)
 	secondDict = db.getDict(wordList[1],1,database)
@@ -112,7 +127,17 @@ def getLeftProbability(wordList, database) :
 	return probableDict
 	
 def getRightProbability(wordList,probableTable,database) :
-	"""Still too tired for documentation. The name of this thing explains itself. Seriously.
+	"""
+	Add to probability table based on probabilities of words right of the
+		missing word
+		
+	Args:
+		wordList: 2-word deque of words right of missing word
+		probableTable: dict of word,count pairs from getLeftProbability()
+		database: Database of word counts
+	Returns:
+		Dict of word,probability pairs (where probability is the summed counts
+			from both words behind and in front of the missing word)
 	"""
 	for word in probableTable :
 		firstDict = getDict(word,1,database)
@@ -124,6 +149,15 @@ def getRightProbability(wordList,probableTable,database) :
 	return probableTable
 
 def main() :
+	"""
+	Create a database of word counts and probabilistically repair documents
+	
+	Args:
+		None
+	Returns:
+		int 0
+		Potential database creation and file output based on user selections
+	"""
 	dbName = raw_input('Please enter a name for the database to be used\n>>> ')
 	database = db.openPidb(dbName)
 	fparser.parseFiles('.txt','r','Please enter a .txt document to be ' + \

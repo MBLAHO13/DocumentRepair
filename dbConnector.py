@@ -87,7 +87,7 @@ def insert(base, fol, twiceFol, db) :
 		base: Base word, used as table name
 		fol: Following word
 		twiceFol: Twice Following word
-		db: Database to work with
+		db: Database of word counts
 	Returns:
 		None
 	"""
@@ -142,7 +142,7 @@ def getDict(base, order, db) :
 	Args:
 		base: Base word, used as table name
 		order: Following, Twice Following, etc. int to show distance from base
-		db: Database to work with
+		db: Database of word counts
 	Returns:
 		Dict of word,count pairs
 	"""
@@ -169,7 +169,7 @@ def getTotal(base, order, db) :
 	Args:
 		base: Base word, used as table name
 		order: Following, Twice Following, etc. int to show distance from base
-		db: Database to work with
+		db: Database of word counts
 	Returns:
 		Sum of column as int
 	"""

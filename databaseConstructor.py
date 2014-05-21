@@ -53,8 +53,7 @@ def fileToDatabase(inputFile, database) :
 	
 	Args:
 		inputFile: File object to read from
-		database: Database to add to (in the form of a MySQLdb Connection 
-			Object)
+		database: Database of word counts
 	Returns:
 		None
 	"""
