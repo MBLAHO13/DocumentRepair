@@ -130,9 +130,12 @@ def getDict(base, order, db) :
 		if i == order :
 			column = str(item[0])
 		i += 1
+	cursor.execute('SELECT SUM(`' + column + '`) FROM `' + base + '`;')
+	for word in cursor :
+		totalCount = word[0]
 	cursor.execute('SELECT `word`,`' + column + '` FROM `' + base + '`;')
 	for (word, count) in cursor :
 		if count > 0 :
-			wordMap[word] = count
+			wordMap[word] = float(count)/float(totalCount)
 	cursor.close()
 	return wordMap
