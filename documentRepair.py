@@ -56,19 +56,20 @@ def repair(doc, database) :
 			# Ignoring blanks
 			if word == '' :
 				continue
-			if word[-1] in ['.','?','!'] :
+			if word[-1] in ['.','?','!'] and len(word) > 0 :
 				word = word.strip('.?!')
 				endOfSentence = True
-			fixedDoc.write(wordQueue.popleft())
+			fixedDoc.write(wordQueue.popleft() + ' ')
 			wordQueue.append(word)
 			if wordQueue[2] == delim :
 				replaceWord(wordQueue, database, userSelect)
 				wordQueue[2] = replaceWord(wordQueue, database)
 			if endOfSentence :
-				fixedDoc.write(wordQueue.popleft())
+				fixedDoc.write(wordQueue.popleft() + ' ')
 				wordQueue.append('.')
 				if wordQueue[2] == delim :
 					wordQueue[2] = replaceWord(wordQueue, database, userSelect)
+				endOfSentence = False
 		while len(wordQueue) > 0 :
 			fixedDoc.write(wordQueue.popleft())
 			

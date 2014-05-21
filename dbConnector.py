@@ -18,11 +18,13 @@ import mysql.connector
 from mysql.connector import errorcode
 
 def getIP() :
-	"""Pulls IP down from webaddress published by the Raspberry Pi
-	Function Arguments
-	None
-	Function Returns
-	IP address as string
+	"""
+	Pull IP down from webaddress published by the Raspberry Pi
+	
+	Args:
+		None
+	Returns:
+		IP address as string
 	"""
 	page = urllib2.urlopen('http://www.cs.drexel.edu/~cpb49/ipaddress')
 	ip = page.read().strip()
@@ -30,23 +32,27 @@ def getIP() :
 	return ip
 
 def getPassword() :
-	"""Acquires password from local file to prevent accidentally leaking
-	the password out to the internet
-	Function Arguments
-	None
-	Function Returns
-	Password as string
+	"""
+	Acquire password from local file to prevent accidentally leaking the 
+		password out to the internet
+	
+	Args:
+		None
+	Returns:
+		Password as string
 	"""
 	with open('password.txt','r') as file :
 		pw = file.read().strip()
 	return pw
 	
 def openPidb(dbName) :
-	"""Opens database on Raspberri Pi for use
-	Function Arguments
-	dbName: Name of the database to be created
-	Function Returns
-	MySQLdb Connection Object
+	"""
+	Open database on Raspberri Pi for use
+	
+	Args:
+		dbName: Name of the database to be created
+	Returns:
+		MySQLdb Connection Object
 	"""
 	db = mysql.connector.connect(user='remoteaccess',password=getPassword(),
 		host=getIP())
@@ -58,18 +64,19 @@ def openPidb(dbName) :
 	cursor.execute('USE `' + dbName + '`;')
 	cursor.execute('SET collation_connection = \'utf8_general_ci\';')
 	cursor.execute('ALTER DATABASE `' + dbName + '` CHARACTER SET utf8 COLLATE utf8_general_ci;')
-		
 	return db
 	
 def insert(base, fol, twiceFol, db) :
-	"""Inserts a triple into the base table
-	Function Arguments
-	base: Base word, used as table name
-	fol: Following word
-	twiceFol: Twice Following word
-	db: Database to work with
-	Function Return
-	None
+	"""
+	Insert a triple into the base table
+	
+	Args:
+		base: Base word, used as table name
+		fol: Following word
+		twiceFol: Twice Following word
+		db: Database to work with
+	Returns:
+		None
 	"""
 	cursor = db.cursor()
 	
@@ -115,11 +122,15 @@ def insert(base, fol, twiceFol, db) :
 	cursor.close()
 	
 def getDict(base, order, db) :
-	"""Chooses one column in base table and converts to dict with words as keys
-	Function Arguments
-	base: Base word, used as table name
-	order: Following, Twice Following, etc. int to show distance from base
-	db: Database to work with
+	"""
+	Choose one column in base table and return as dict with words as keys
+	
+	Args:
+		base: Base word, used as table name
+		order: Following, Twice Following, etc. int to show distance from base
+		db: Database to work with
+	Returns:
+		Dict of word,count pairs
 	"""
 	cursor = db.cursor()
 	wordMap = {}
@@ -138,11 +149,15 @@ def getDict(base, order, db) :
 	return wordMap
 	
 def getTotal(base, order, db) :
-	"""Returns the total count from a column in the table
-	Function Arguments
-	base: Base word, used as table name
-	order: Following, Twice Following, etc. int to show distance from base
-	db: Database to work with
+	"""
+	Sum a column in the table
+	
+	Args:
+		base: Base word, used as table name
+		order: Following, Twice Following, etc. int to show distance from base
+		db: Database to work with
+	Returns:
+		Sum of column as int
 	"""
 	cursor = db.cursor()
 	cursor.execute('SELECT SUM(`' + column + '`) FROM `' + base + '`;')

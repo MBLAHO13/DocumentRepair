@@ -17,18 +17,22 @@ Written for Python 2.7
 import sys
 import dbConnector as db
 import mysql.connector
+from collections import deque
 
 def parseFiles(fileExt, mode, inputMessage, parseFunc, *args) :
-	"""Continually requests user input files and processes with parseFunc
-	Function Arguments
-	fileExt: Extension for file to be parsed
-	mode: Python-defined modes for opening a file (r,w,rw,...)
-	inputMessage: Message shown to user requesting file names for processing
-	parseFunc: Function to be run on opened files. Must accept file object as
-	input.
-	*args: Arguments to be pased to parseFunc after the file object.
-	Function Returns
-	None
+	"""
+	Continually request user input files and process with parseFunc
+	
+	Args:
+		fileExt: Extension for file to be parsed
+		mode: Python-defined modes for opening a file (r,w,rw,...)
+		inputMessage: Message shown to user requesting file names for 
+			processing
+		parseFunc: Function to be run on opened files. Must accept file object
+			as input.
+		*args: Arguments to be pased to parseFunc after the file object.
+	Returns:
+		None
 	"""
 	userInput = ''
 	while userInput not in ('EXIT','CONTINUE') :
@@ -44,17 +48,20 @@ def parseFiles(fileExt, mode, inputMessage, parseFunc, *args) :
 			print 'Incorrect file extension'
 
 def fileToDatabase(inputFile, database) :
-	"""Builds database of word triplets from file object
-	Function Arguments
-	inputFile: File object to read from
-	database: Database to add to (in the form of a MySQLdb Connection Object)
-	Function Returns
-	None
 	"""
-	current = fol = twiceFol = '.'
+	Build database of word triplets from file object
+	
+	Args:
+		inputFile: File object to read from
+		database: Database to add to (in the form of a MySQLdb Connection 
+			Object)
+	Returns:
+		None
+	"""
+	wordQueue = deque('.'*3)
 	# Splitting into words
-	# i = 0 # TEST CODE PLEASE IGNORE
 	print 'Inserting words from ' + inputFile.name + '...'
+	numAdded = 0
 	for word in inputFile.read().replace('--',' ').split() :
 		# Cleaning input
 		word = word.lower().strip(' \t,;:()\'"[]')
@@ -63,21 +70,32 @@ def fileToDatabase(inputFile, database) :
 			continue
 			
 		# Establishing punctuation as separate 'word' in database
-		if word[-1] in ['.','?','!'] :
+		if word[-1] in ['.','?','!'] and len(word) > 1:
 			word = word.strip('.?!')
-			current,fol,twiceFol,word = fol,twiceFol,word,'.' # Shifting buffer
-			db.insert(current,fol,twiceFol,database)
+			# Shifting buffer
+			wordQueue.popleft()
+			wordQueue.append(word)
+			word = '.'
+			db.insert(wordQueue[0],wordQueue[1],wordQueue[2],database)
+			numAdded += 2
 			
 		# Moving buffer and adding to database
-		current,fol,twiceFol = fol,twiceFol,word
-		if not (current == '.' and fol == '.') :
-			db.insert(current,fol,twiceFol,database)
-		'''i += 1
-		if i > 200 : # TEST CODE PLEASE IGNORE
-			break'''
+		wordQueue.popleft()
+		wordQueue.append(word)
+		if not (wordQueue[0] == '.' and wordQueue[1] == '.') :
+			db.insert(wordQueue[0],wordQueue[1],wordQueue[2],database)
+			numAdded += 2
+		if (numAdded % 100) == 0 :
+			print 'Words added: ', numAdded
 				
 def main() :
-	"""Runs fileToDatabase in parseFiles to create a database from .txt files
+	"""
+	Create a database of word counts in triplets from .txt files
+	
+	Args:
+		None
+	Returns:
+		int 0
 	"""
 	probabilitydb = db.openPidb('testDB')
 	parseFiles('.txt','r','Please enter a .txt document to be parsed and ' + \
