@@ -89,16 +89,16 @@ def isTable(base, db) :
 		return True;
 	
 def isRow(base, word, db):
-    cursor=db.cursor()
-    field=0;
-    cursor.execute('SELECT COUNT(*) FROM `'+base+'` where Word="'+word+'"')
+	cursor=db.cursor()
+	field=0;
+	cursor.execute('SELECT COUNT(*) FROM `'+base+'` where Word="'+word+'"')
 
-    for row in cursor.fetchall() :
-       field = row[0];
-    if field==0:
-                   return False;
-    else:
-                   return True;
+	for row in cursor.fetchall() :
+		field = row[0];
+	if field==0:
+		return False;
+	else:
+		return True;
 	
 def insert(base, fol, twiceFol, db) :
 	"""
@@ -166,7 +166,7 @@ def getDict(base, order, db) :
 		if i == order :
 			column = str(item[0])
 		i += 1
-	totalCount = getTotal(base, order, db)
+	totalCount = getTotal(base, column, db)
 	cursor.execute('SELECT `word`,`' + column + '` FROM `' + base + '`;')
 	for (word, count) in cursor :
 		if count > 0 :
@@ -174,13 +174,13 @@ def getDict(base, order, db) :
 	cursor.close()
 	return wordMap
 	
-def getTotal(base, order, db) :
+def getTotal(base, column, db) :
 	"""
 	Sum a column in the table
 	
 	Args:
 		base: Base word, used as table name
-		order: Following, Twice Following, etc. int to show distance from base
+		column: Name of column
 		db: Database of word counts
 	Returns:
 		Sum of column as int

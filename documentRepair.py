@@ -55,7 +55,8 @@ def repair(doc, database) :
 	with open(doc.name + '~repaired','w') as fixedDoc :
 		delim = '...#' # raw_input('Enter a string to represent a missing word\n>>> ')
 		wordQueue = deque('.'*5)
-		for word in inputFile.read().replace('--',' ').split() :
+		endOfSentence = False
+		for word in doc.read().replace('--',' ').split() :
 			# Cleaning input
 			word = word.lower().strip(' \t,;:()\'"[]')
 			# Ignoring blanks
@@ -68,7 +69,7 @@ def repair(doc, database) :
 			wordQueue.append(word)
 			if wordQueue[2] == delim :
 				replaceWord(wordQueue, database, userSelect)
-				wordQueue[2] = replaceWord(wordQueue, database)
+				wordQueue[2] = replaceWord(wordQueue, database, userSelect)
 			if endOfSentence :
 				fixedDoc.write(wordQueue.popleft() + ' ')
 				wordQueue.append('.')
@@ -88,19 +89,23 @@ def replaceWord(wordList, database, userSelect) :
 	Returns:
 		string: returns chosen string to replace missing word
 	"""
-	probableTable = getLeftProbability(wordList[:2],database)
-	probableTable = getRightProbability(wordList[3:],probableTable,database)
+	probableTable = getLeftProbability(wordList,database)
+	probableTable = getRightProbability(wordList,probableTable,database)
 	sortedProbabilities = zip(probableTable.values(),probableTable.keys())
-	sortedProbabilities.sort()
-	sortedProbabilities.reverse()
-	chosenWord = sortedProbabilities[0][1]
+	#sortedProbabilities.sort()
+	#sortedProbabilities.reverse()
+	chosenWord = str(sortedProbabilities[0][1])
 	if userSelect :
-		print '{1:15s} {2:15s}'.format('Word','Probability')
-		for i in range(20) :
-			print '{1:15s} {2:.3f}%'.format(sortedProbabilities[i][1],sortedProbabilities[i][0]*float(25))
-		print 'Current line: ', wordList
+		print 'Word'.ljust(15),'Probability'.ljust(15)
+		listLimiter = 30;
+		for word in sortedProbabilities :
+			print word[1].ljust(15), (str(word[0]*float(25)) + '%').ljust(15)
+			listLimiter = listLimiter-1
+			if listLimiter <= 0 :
+				break
+		print wordList
 		chosenWord = raw_input('Select a word from the list or input your ' + \
-			'own to replace missing word\n>>> ')
+			 'own to replace missing word\n>>> ')
 	return chosenWord
 		
 def getLeftProbability(wordList, database) :
@@ -140,12 +145,12 @@ def getRightProbability(wordList,probableTable,database) :
 			from both words behind and in front of the missing word)
 	"""
 	for word in probableTable :
-		firstDict = getDict(word,1,database)
-		secondDict = getDict(word,2,database)
-		if wordList[0] in firstDict :
-			probableTable[word] += firstDict[wordList[0]]
-		if wordList[1] in secondDict :
-			probableTable[word] += secondDict[wordList[1]]
+		firstDict = db.getDict(word,1,database)
+		secondDict = db.getDict(word,2,database)
+		if wordList[3] in firstDict :
+			probableTable[word] += firstDict[wordList[3]]
+		if wordList[4] in secondDict :
+			probableTable[word] += secondDict[wordList[4]]
 	return probableTable
 
 def main() :
