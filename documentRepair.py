@@ -82,16 +82,45 @@ def replaceWord(wordList, database, userSelect)
 	"""
 	probableTable = getLeftProbability(wordList[:2],database)
 	probableTable = getRightProbability(wordList[3:],probableTable,database)
-	chosenWord = probableTable[0][1]
+	sortedProbabilities = zip(probableTable.values(),probableTable.keys())
+	sortedProbabilities.sort()
+	sortedProbabilities.reverse()
+	chosenWord = sortedProbabilities[0][1]
 	if userSelect :
 		print '{1:15s} {2:15s}'.format('Word','Probability')
-		for word in probableTable :
-			print '{1:15s} {2:.3f}'.format(word,probableTable[word]*float(100))
+		for i in range(20)
+			print '{1:15s} {2:.3f}%'.format(sortedProbabilities[i][1],sortedProbabilities[i][0]*float(25))
 		print 'Current line: ', wordList
 		chosenWord = raw_input('Select a word from the list or input your ' + \
 			'own to replace missing word\n>>> ')
 	return chosenWord
 		
+def getLeftProbability(wordList, database) :
+	"""Does some shit i'm too tired for documenting right now
+	"""
+	firstDict = db.getDict(wordList[0],2,database)
+	secondDict = db.getDict(wordList[1],1,database)
+	probableDict = {}
+	for word in firstDict :
+		probableDict[word] = firstDict[word]
+	for word in secondDict :
+		if word in probableDict :
+			probableDict[word] += secondDict[word]
+		else :
+			probableDict[word] = secondDict[word]
+	return probableDict
+	
+def getRightProbability(wordList,probableTable,database)
+	"""Still too tired for documentation. The name of this thing explains itself. Seriously.
+	"""
+	for word in probableTable :
+		firstDict = getDict(word,1,database)
+		secondDict = getDict(word,2,database)
+		if wordList[0] in firstDict :
+			probableTable[word] += firstDict[wordList[0]]
+		if wordList[1] in secondDict :
+			probableTable[word] += secondDict[wordList[1]]
+	return probableTable
 
 def main() :
 	dbName = raw_input('Please enter a name for the database to be used\n>>> ')
