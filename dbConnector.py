@@ -81,9 +81,9 @@ def isTable(base, db) :
 	field=0;
 	cursor.execute('SELECT COUNT(*)FROM information_schema.tables WHERE table_schema = "' + str(db.database) + '" AND table_name = "'+base+'"' )
 	for row in cursor.fetchall():
-		field = str(row[0]);
+		field = row[0];
 	cursor.close();
-	if field==0:
+	if field == 0 :
 		return False;
 	else:
 		return True;
