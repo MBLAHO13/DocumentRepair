@@ -13,7 +13,7 @@ Written for Python 2.7
 """
 import sys
 import dbConnector as db
-import databaseConstructor as fileParser
+import databaseConstructor as fparser
 import mysql.connector
 from collections import deque
 
@@ -46,6 +46,7 @@ def repair(doc, database) :
 	Function Returns
 	File output, but no function returns
 	"""
+	userSelect = userSelectOn()
 	with open(doc.name + '~repaired','w') as fixedDoc :
 		delim = raw_input('Enter a string to represent a missing word\n>>> ')
 		wordQueue = deque('.'*5)
@@ -61,17 +62,17 @@ def repair(doc, database) :
 			fixedDoc.write(wordQueue.popleft())
 			wordQueue.append(word)
 			if wordQueue[2] == delim :
-				replaceWord(wordQueue, database)
+				replaceWord(wordQueue, database, userSelect)
 				wordQueue[2] = replaceWord(wordQueue, database)
 			if endOfSentence :
 				fixedDoc.write(wordQueue.popleft())
 				wordQueue.append('.')
 				if wordQueue[2] == delim :
-					wordQueue[2] = replaceWord(wordQueue, database)
+					wordQueue[2] = replaceWord(wordQueue, database, userSelect)
 		while len(wordQueue) > 0 :
 			fixedDoc.write(wordQueue.popleft())
 			
-def replaceWord(wordList, database)
+def replaceWord(wordList, database, userSelect)
 	"""Replaces a missing word by probaility or by selection from probable list
 	Function Arugments
 	wordList: Queue of 5 words including missing word
@@ -79,15 +80,26 @@ def replaceWord(wordList, database)
 	Function Return
 	string: returns chosen string to replace missing word
 	"""
-	# TODO: this. This whole thing right here. Do this.
+	probableTable = getLeftProbability(wordList[:2],database)
+	probableTable = getRightProbability(wordList[3:],probableTable,database)
+	chosenWord = probableTable[0][1]
+	if userSelect :
+		print '{1:15s} {2:15s}'.format('Word','Probability')
+		for word in probableTable :
+			print '{1:15s} {2:.3f}'.format(word,probableTable[word]*float(100))
+		print 'Current line: ', wordList
+		chosenWord = raw_input('Select a word from the list or input your ' + \
+			'own to replace missing word\n>>> ')
+	return chosenWord
+		
 
 def main() :
 	dbName = raw_input('Please enter a name for the database to be used\n>>> ')
 	database = db.openPidb(dbName)
-	fileParser.parseFiles('.txt','r','Please enter a .txt document to be ' + \
+	fparser.parseFiles('.txt','r','Please enter a .txt document to be ' + \
 		'parsed and added to the database or\n"CONTINUE" to repair ' + \
-		'documents or "EXIT" to quit\n>>> ',fileParser.fileToDatabase,database)
-	fileParser.parseFiles('.txt','r','Please enter a .txt file to be ' + \
+		'documents or "EXIT" to quit\n>>> ',fparser.fileToDatabase,database)
+	fparser.parseFiles('.txt','r','Please enter a .txt file to be ' + \
 		'repaired or "EXIT" to quit\n>>> ',repair,database)
 	database.close()
 	return 0
