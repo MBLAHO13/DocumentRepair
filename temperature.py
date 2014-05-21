@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # This script written to moniotr the Pi's temperature.
 # Colleen Blaho - 2014 ENGR 103
-# Comment by Karishma Changlani to test gitHub.
+
 import subprocess
 import smtplib
 import socket
