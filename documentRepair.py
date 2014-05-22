@@ -92,18 +92,21 @@ def replaceWord(wordList, database, userSelect) :
 	probableTable = getLeftProbability(wordList,database)
 	probableTable = getRightProbability(wordList,probableTable,database)
 	sortedProbabilities = zip(probableTable.values(),probableTable.keys())
-	#sortedProbabilities.sort()
-	#sortedProbabilities.reverse()
+	sortedProbabilities.sort()
+	sortedProbabilities.reverse()
 	chosenWord = str(sortedProbabilities[0][1])
 	if userSelect :
-		print 'Word'.ljust(15),'Probability'.ljust(15)
+		print 'Word:'.ljust(15),'Probability:'.ljust(15)
 		listLimiter = 30;
 		for word in sortedProbabilities :
 			print word[1].ljust(15), (str(word[0]*float(25)) + '%').ljust(15)
 			listLimiter = listLimiter-1
 			if listLimiter <= 0 :
 				break
-		print wordList
+		print 'Context:',
+		for word in wordList :
+			print word,
+		print # newline
 		chosenWord = raw_input('Select a word from the list or input your ' + \
 			 'own to replace missing word\n>>> ')
 	return chosenWord
