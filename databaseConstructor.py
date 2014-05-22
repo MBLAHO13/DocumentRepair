@@ -19,13 +19,13 @@ import dbConnector as db
 import mysql.connector
 from collections import deque
 
-def parseFiles(fileExt, mode, inputMessage, parseFunc, *args) :
+def parseFiles(fileExt, exitList, inputMessage, parseFunc, *args) :
 	"""
 	Continually request user input files and process with parseFunc
 	
 	Args:
 		fileExt: Extension for file to be parsed
-		mode: Python-defined modes for opening a file (r,w,rw,...)
+		exitList: List of strings the user can terminate the program with.
 		inputMessage: Message shown to user requesting file names for 
 			processing
 		parseFunc: Function to be run on opened files. Must accept file object
@@ -35,11 +35,11 @@ def parseFiles(fileExt, mode, inputMessage, parseFunc, *args) :
 		None
 	"""
 	userInput = ''
-	while userInput not in ('EXIT','CONTINUE') :
+	while userInput not in exitList :
 		userInput = raw_input(inputMessage)
 		if userInput.endswith(fileExt) :
 			try :
-				 with open(userInput,mode) as userFile :
+				 with open(userInput,'r') as userFile :
 					parseFunc(userFile,*args)
 			except IOError :
 				print 'Failed to open file correctly. Check to make sure ' + \
@@ -96,8 +96,9 @@ def main() :
 	Returns:
 		int 0
 	"""
+	exitList = [ 'EXIT', 'CONTINUE' ]
 	probabilitydb = db.openPidb('testDB')
-	parseFiles('.txt','r','Please enter a .txt document to be parsed and ' + \
+	parseFiles('.txt',exitList,'Please enter a .txt document to be parsed and ' + \
 		'added to the database or "EXIT"\nto quit\n>>> ',fileToDatabase,
 		probabilitydb)
 	probabilitydb.close()

@@ -163,12 +163,13 @@ def main() :
 		int 0
 		Potential database creation and file output based on user selections
 	"""
+	exitList = [ "EXIT", "CONTINUE" ]
 	dbName = raw_input('Please enter a name for the database to be used\n>>> ')
 	database = db.openPidb(dbName)
-	fparser.parseFiles('.txt','r','Please enter a .txt document to be ' + \
+	fparser.parseFiles('.txt',exitList,'Please enter a .txt document to be ' + \
 		'parsed and added to the database or\n"CONTINUE" to repair ' + \
-		'documents or "EXIT" to quit\n>>> ',fparser.fileToDatabase,database)
-	fparser.parseFiles('.txt','r','Please enter a .txt file to be ' + \
+		'documents\n>>> ',fparser.fileToDatabase,database)
+	fparser.parseFiles('.txt',exitList,'Please enter a .txt file to be ' + \
 		'repaired or "EXIT" to quit\n>>> ',repair,database)
 	database.close()
 	return 0
