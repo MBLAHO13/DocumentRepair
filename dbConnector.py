@@ -160,19 +160,24 @@ def getDict(base, order, db) :
 	"""
 	cursor = db.cursor()
 	wordMap = {}
-	cursor.execute('DESCRIBE `' + base + '`;')
-	i = 0
-	for item in cursor :
-		if i == order :
-			column = str(item[0])
-		i += 1
-	totalCount = getTotal(base, column, db)
-	cursor.execute('SELECT `word`,`' + column + '` FROM `' + base + '`;')
-	for (word, count) in cursor :
-		if count > 0 :
-			wordMap[word] = float(count)/float(totalCount)
-	cursor.close()
-	return wordMap
+	try :
+		cursor.execute('DESCRIBE `' + base + '`;')
+	except mysql.connector.errors.ProgrammingError :
+		pass
+	else :
+		i = 0
+		for item in cursor :
+			if i == order :
+				column = str(item[0])
+			i += 1
+		totalCount = getTotal(base, column, db)
+		cursor.execute('SELECT `word`,`' + column + '` FROM `' + base + '`;')
+		for (word, count) in cursor :
+			if count > 0 :
+				wordMap[word] = float(count)/float(totalCount)
+	finally :
+		cursor.close()
+		return wordMap
 	
 def getTotal(base, column, db) :
 	"""
