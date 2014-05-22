@@ -1,7 +1,7 @@
 """
 Document Repair
 Uses the database of triples created by databaseConstructor and dbConnector to
-predict words missing from input documents deliniated by user-chosen delimiter
+predict words missing from input documents expressed as ...#
 The user is given a choice between outputting a table of likely words to the 
 console or inserting the most likely word into a copy of the document.
 
@@ -53,7 +53,7 @@ def repair(doc, database) :
 	"""
 	userSelect = userSelectOn()
 	with open(doc.name + '~repaired','w') as fixedDoc :
-		delim = '...#' # raw_input('Enter a string to represent a missing word\n>>> ')
+		delim = '...#'
 		wordQueue = deque('.'*5)
 		endOfSentence = False
 		for word in doc.read().replace('--',' ').split() :
@@ -68,7 +68,6 @@ def repair(doc, database) :
 			fixedDoc.write(wordQueue.popleft() + ' ')
 			wordQueue.append(word)
 			if wordQueue[2] == delim :
-				replaceWord(wordQueue, database, userSelect)
 				wordQueue[2] = replaceWord(wordQueue, database, userSelect)
 			if endOfSentence :
 				fixedDoc.write(wordQueue.popleft() + ' ')
@@ -91,14 +90,14 @@ def replaceWord(wordList, database, userSelect) :
 	"""
 	probableTable = getLeftProbability(wordList,database)
 	probableTable = getRightProbability(wordList,probableTable,database)
-	sortedProbabilities = zip(probableTable.values(),probableTable.keys())
-	sortedProbabilities.sort()
-	sortedProbabilities.reverse()
-	chosenWord = str(sortedProbabilities[0][1])
+	sortedTable = zip(probableTable.values(),probableTable.keys())
+	sortedTable.sort()
+	sortedTable.reverse()
+	chosenWord = str(sortedTable[0][1])
 	if userSelect :
 		print 'Word:'.ljust(15),'Probability:'.ljust(15)
 		listLimiter = 30;
-		for word in sortedProbabilities :
+		for word in sortedTable :
 			print word[1].ljust(15), (str(word[0]*float(25)) + '%').ljust(15)
 			listLimiter = listLimiter-1
 			if listLimiter <= 0 :
