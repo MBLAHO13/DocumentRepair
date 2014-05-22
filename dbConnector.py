@@ -3,7 +3,7 @@ Interfaces between python and a remote SQL database and has functions to work
 in conjunction with databaseConstructor and documentRepair for creating and
 maintaining the database.
 
-Uses mysql.connector from http://dev.mysql.com/doc/connector-python/en/index.html
+mysql.connector from http://dev.mysql.com/doc/connector-python/en/index.html
 
 Max Mattes, Karishma Changlani, Colleen Blaho
 05/20/2014
@@ -61,7 +61,8 @@ def openPidb(dbName) :
 	try :
 		cursor.execute('CREATE DATABASE `' + dbName + '`;')
 		cursor.execute('SET collation_connection = \'utf8_general_ci\';')
-		cursor.execute('ALTER DATABASE `' + dbName + '` CHARACTER SET utf8 COLLATE utf8_general_ci;')
+		cursor.execute('ALTER DATABASE `' + dbName + '` CHARACTER SET utf8' + \
+			'COLLATE utf8_general_ci;')
 	except mysql.connector.errors.DatabaseError :
 		pass
 	cursor.execute('USE `' + dbName + '`;')
@@ -69,7 +70,7 @@ def openPidb(dbName) :
 
 def isTable(base, db) :
 	"""
-	Checks if a base table already exists in the database
+	Check if a base table already exists in the database
 	
 	Args:
 		base: Base word, used as table name
@@ -78,27 +79,33 @@ def isTable(base, db) :
 		False if table does not exist, True otherwise
 	"""
 	cursor = db.cursor();
-	field=0;
-	cursor.execute('SELECT COUNT(*)FROM information_schema.tables WHERE table_schema = "' + str(db.database) + '" AND table_name = "'+base+'"' )
-	for row in cursor.fetchall():
-		field = row[0];
+	tableExists = False;
+	cursor.execute('SELECT COUNT(*)FROM information_schema.tables WHERE ' + \
+		'table_schema = "' + str(db.database) + '" AND table_name = "' + \
+		base + '"' )
+	for row in cursor :
+		tableExists = row[0];
 	cursor.close();
-	if field == 0 :
-		return False;
-	else:
-		return True;
+	return tableExists
 	
 def isRow(base, word, db):
+	"""
+	Check if a word already exists in the base table
+	
+	Args:
+		base: Base word, used as table name
+		word: Word row to be searched for
+		db: Database of word counts
+	Returns:
+		False if row does not exist, True otherwise
+	"""
 	cursor=db.cursor()
-	field=0;
-	cursor.execute('SELECT COUNT(*) FROM `'+base+'` where Word="'+word+'"')
-
-	for row in cursor.fetchall() :
-		field = row[0];
-	if field==0:
-		return False;
-	else:
-		return True;
+	rowExists = False;
+	cursor.execute('SELECT COUNT(*) FROM `' + base + '` where `word`="' + \
+		word + '"')
+	for row in cursor :
+		rowExists = row[0];
+	return rowExists
 	
 def insert(base, fol, twiceFol, db) :
 	"""
@@ -120,27 +127,17 @@ def insert(base, fol, twiceFol, db) :
 			'`FirstFollowing` int NOT NULL DEFAULT 0, `SecondFollowing` ' + \
 			'int NOT NULL DEFAULT 0, PRIMARY KEY (`word`));')
 	
-	'''Attempts to create a new row for fol. If it fails, that means the row 
-	already exists and it moves on'''
-	try :
+	if not isRow(base, fol, db) :
 		cursor.execute('INSERT INTO `' + base + '` (`word`,`FirstFollowing`' +\
 			',`SecondFollowing`) VALUES ("' + fol + '",0,0);')
-	except mysql.connector.IntegrityError as err :
-		pass
-	
-	'''Increments 'fol' row for following count'''
+			
 	cursor.execute('UPDATE `' + base + '` SET FirstFollowing = ' + \
 		'FirstFollowing + 1 WHERE STRCMP(`word`,"' + fol + '") = 0;')
 		
-	'''Attempts to create a new row for twiceFol. If it fails, that means the
-	row already exists and it moves on'''
-	try :
+	if not isRow(base, twiceFol, db) :
 		cursor.execute('INSERT INTO `' + base + '` (`word`,`FirstFollowing`' +\
 			',`SecondFollowing`) VALUES ("' + twiceFol + '",0,0);')
-	except mysql.connector.IntegrityError as err :
-		pass
 	
-	'''Increments row for following or twice following count'''
 	cursor.execute('UPDATE `' + base + '` SET SecondFollowing = ' + \
 		'SecondFollowing + 1 WHERE STRCMP(`word`,"' + twiceFol + '") = 0;')
 	
