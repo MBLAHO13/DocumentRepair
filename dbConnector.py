@@ -60,11 +60,11 @@ def openPidb(dbName) :
 	cursor = db.cursor()
 	try :
 		cursor.execute('CREATE DATABASE `' + dbName + '`;')
-		cursor.execute('SET collation_connection = \'utf8_general_ci\';')
-		cursor.execute('ALTER DATABASE `' + dbName + '` CHARACTER SET utf8' + \
-			'COLLATE utf8_general_ci;')
 	except mysql.connector.errors.DatabaseError :
 		pass
+	cursor.execute('ALTER DATABASE `' + dbName + '` CHARACTER SET utf8 ' + \
+		'COLLATE utf8_general_ci;')
+	cursor.execute('SET collation_connection = \'utf8_general_ci\';')
 	cursor.execute('USE `' + dbName + '`;')
 	return db
 
@@ -78,17 +78,17 @@ def isTable(base, db) :
 	Returns:
 		False if table does not exist, True otherwise
 	"""
-	cursor = db.cursor();
-	tableExists = False;
+	cursor = db.cursor()
+	tableExists = False
 	cursor.execute('SELECT COUNT(*)FROM information_schema.tables WHERE ' + \
 		'table_schema = "' + str(db.database) + '" AND table_name = "' + \
 		base + '"' )
 	for row in cursor :
-		tableExists = row[0];
-	cursor.close();
+		tableExists = row[0]
+	cursor.close()
 	return tableExists
 	
-def isRow(base, word, db):
+def isRow(base, word, db) :
 	"""
 	Check if a word already exists in the base table
 	
@@ -99,12 +99,13 @@ def isRow(base, word, db):
 	Returns:
 		False if row does not exist, True otherwise
 	"""
-	cursor=db.cursor()
-	rowExists = False;
+	cursor = db.cursor()
+	rowExists = False
 	cursor.execute('SELECT COUNT(*) FROM `' + base + '` where `word`="' + \
 		word + '"')
 	for row in cursor :
-		rowExists = row[0];
+		rowExists = row[0]
+	cursor.close()
 	return rowExists
 	
 def insert(base, fol, twiceFol, db) :
