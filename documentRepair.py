@@ -145,8 +145,8 @@ def getRightProbability(wordList,probableTable,database) :
 			from both words behind and in front of the missing word)
 	"""
 	for word in probableTable :
-		firstDict = db.getDict(word,1,database)
-		secondDict = db.getDict(word,2,database)
+		firstDict = db.getRow(word,wordList[3],1,database)
+		secondDict = db.getRow(word,wordList[4],2,database)
 		if wordList[3] in firstDict :
 			probableTable[word] += firstDict[wordList[3]]
 		if wordList[4] in secondDict :
