@@ -165,11 +165,12 @@ def main() :
 	"""
 	dbName = raw_input('Please enter a name for the database to be used\n>>> ')
 	database = db.openPidb(dbName)
-	fparser.parseFiles('.txt',['EXIT','CONTINUE'],'Please enter a .txt document to be ' + \
+	exit = fparser.parseFiles('.txt',['EXIT','CONTINUE'],'Please enter a .txt document to be ' + \
 		'parsed and added to the database or\n"CONTINUE" to repair ' + \
 		'documents\n>>> ',fparser.fileToDatabase,database)
-	fparser.parseFiles('.txt',['EXIT'],'Please enter a .txt file to be ' + \
-		'repaired or "EXIT" to quit\n>>> ',repair,database)
+	if not exit :
+		fparser.parseFiles('.txt',['EXIT'],'Please enter a .txt file to be ' + \
+			'repaired or "EXIT" to quit\n>>> ',repair,database)
 	database.close()
 	return 0
 

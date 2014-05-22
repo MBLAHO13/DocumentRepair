@@ -26,13 +26,16 @@ def parseFiles(fileExt, exitList, inputMessage, parseFunc, *args) :
 	Args:
 		fileExt: Extension for file to be parsed
 		exitList: List of strings the user can terminate the program with.
+			exitList[0] is always the exit string.
 		inputMessage: Message shown to user requesting file names for 
 			processing
 		parseFunc: Function to be run on opened files. Must accept file object
 			as input.
 		*args: Arguments to be pased to parseFunc after the file object.
 	Returns:
-		None
+	   BOOL true or false.
+		True: The user wants to quit.
+		False: The user wants to continue. 	
 	"""
 	userInput = ''
 	while userInput not in exitList :
@@ -44,8 +47,11 @@ def parseFiles(fileExt, exitList, inputMessage, parseFunc, *args) :
 			except IOError :
 				print 'Failed to open file correctly. Check to make sure ' + \
 					'it is in the current working directory'
+		elif userInput == exitList[0] :
+			return True
 		elif userInput not in ('EXIT','CONTINUE') :
 			print 'Incorrect file extension'
+	return False
 
 def fileToDatabase(inputFile, database) :
 	"""
