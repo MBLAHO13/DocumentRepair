@@ -103,10 +103,19 @@ def main() :
 		int 0
 	"""
 	exitList = [ 'EXIT', 'CONTINUE' ]
+
 	probabilitydb = db.openPidb('testDB')
-	parseFiles('.txt',exitList,'Please enter a .txt document to be parsed and ' + \
-		'added to the database or "EXIT"\nto quit\n>>> ',fileToDatabase,
-		probabilitydb)
+	if len(sys.argv) > 1:
+		for x in sys.argv[1:]:
+			try: 
+				with open(x, 'r') as file:
+					fileToDatabase(file, probabilitydb)
+			except IOError:
+				print "File " + x + " could not be opened.\n"
+	else:	
+		parseFiles('.txt',exitList,'Please enter a .txt document to be parsed and ' + \
+			'added to the database or "EXIT"\nto quit\n>>> ',fileToDatabase,
+			probabilitydb)
 	probabilitydb.close()
 	return 0
 
