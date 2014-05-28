@@ -1,9 +1,12 @@
 
 #DO NOT CHANGE THIS FILE. 
 password.txt
-
-
+localPassword.txt
 password.txt~
 greatExpectations.txt
 testBook.txt
 testBroken.txt
+*.pyc
+*.txt~repaired
+*.txt
+
