@@ -58,7 +58,7 @@ def openPidb(dbName) :
 		MySQLdb Connection Object
 	"""
 	db = mysql.connector.connect(user='root',password=getPassword(),
-		host=localhost) ##!!
+		host='localhost') ##!!
 	cursor = db.cursor()
 	try :
 		cursor.execute('CREATE DATABASE `' + dbName + '`;')
