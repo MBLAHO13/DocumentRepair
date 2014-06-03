@@ -103,8 +103,8 @@ def main() :
 		int 0
 	"""
 	exitList = [ 'EXIT', 'CONTINUE' ]
-
-	probabilitydb = db.openPidb('testDB')
+	dbName = raw_input("Enter the name of the database to be used: ")
+	probabilitydb = db.openPidb(dbName)
 	if len(sys.argv) > 1:
 		for x in sys.argv[1:]:
 			try: 

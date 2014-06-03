@@ -18,6 +18,7 @@ import urllib2
 import mysql.connector
 from mysql.connector import errorcode
 
+tableList = []
 def getIP() :
 	"""
 	Pull IP down from webaddress published by the Raspberry Pi
@@ -55,6 +56,7 @@ def openPidb(dbName) :
 	Returns:
 		MySQLdb Connection Object
 	"""
+	print "Setting up database, please wait."
 	db = mysql.connector.connect(user='remoteaccess',password=getPassword(),
 		host=getIP())
 	cursor = db.cursor()
@@ -66,6 +68,10 @@ def openPidb(dbName) :
 		'COLLATE utf8_general_ci;')
 	cursor.execute('SET collation_connection = \'utf8_general_ci\';')
 	cursor.execute('USE `' + dbName + '`;')
+	cursor.execute("SHOW TABLES")
+	global tableList
+	for table_name in cursor:
+		tableList.append(table_name[0])	
 	return db
 
 def isTable(base, db) :
@@ -78,8 +84,11 @@ def isTable(base, db) :
 	Returns:
 		False if table does not exist, True otherwise
 	"""
-	cursor = db.cursor()
 	tableExists = False
+	
+	if unicode(base, "utf-8") in tableList: #check our bookeeping list
+		return True
+	cursor = db.cursor()
 	cursor.execute('SELECT COUNT(*)FROM information_schema.tables WHERE ' + \
 		'table_schema = "' + str(db.database) + '" AND table_name = "' + \
 		base + '"' )
@@ -121,12 +130,13 @@ def insert(base, fol, twiceFol, db) :
 		None
 	"""
 	cursor = db.cursor()
-	
+	global tableList
 	# Creates table if it does not already exist
 	if not isTable(base, db):
 		cursor.execute('CREATE TABLE `' + base + '` ( `word` varchar(50), ' + \
 			'`FirstFollowing` int NOT NULL DEFAULT 0, `SecondFollowing` ' + \
 			'int NOT NULL DEFAULT 0, PRIMARY KEY (`word`));')
+		tableList.append(base) #keep track of our additions
 	
 	if not isRow(base, fol, db) :
 		cursor.execute('INSERT INTO `' + base + '` (`word`,`FirstFollowing`' +\
