@@ -67,6 +67,7 @@ def fileToDatabase(inputFile, database) :
 	# Splitting into words
 	print 'Inserting words from ' + inputFile.name + '...'
 	numAdded = 0
+	
 	for word in inputFile.read().replace('--',' ').split() :
 		# Cleaning input
 		word = word.lower().strip(' \t,;:()\'"[]')
@@ -112,6 +113,10 @@ def main() :
 					fileToDatabase(file, probabilitydb)
 			except IOError:
 				print "File " + x + " could not be opened.\n"
+			except OperationalError: 
+				probabilitydb = db.openPidb(dbInput) # reconnect to the database
+				fileToDatabase(file, probabilitydb) #retry the failed book add
+			
 	else:	
 		parseFiles('.txt',exitList,'Please enter a .txt document to be parsed and ' + \
 			'added to the database or "EXIT"\nto quit\n>>> ',fileToDatabase,

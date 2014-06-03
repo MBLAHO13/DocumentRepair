@@ -24,7 +24,8 @@ f.write(str(today))
 if temperatureString > 60.0: 
 	to = 'cpb49@drexel.edu'
 	gmail_user = 'colleen.blaho@gmail.com'
-	gmail_password = 'battery13lamp'
+	gmail_password = [censored]
+	
 	smtpserver = smtplib.SMTP('smtp.gmail.com', 587)
 	smtpserver.ehlo()
 	smtpserver.starttls()

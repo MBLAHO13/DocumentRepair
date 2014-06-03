@@ -74,6 +74,7 @@ def openPidb(dbName) :
 		tableList.append(table_name[0])	
 	return db
 
+
 def isTable(base, db) :
 	"""
 	Check if a base table already exists in the database
@@ -137,7 +138,10 @@ def insert(base, fol, twiceFol, db) :
 			'`FirstFollowing` int NOT NULL DEFAULT 0, `SecondFollowing` ' + \
 			'int NOT NULL DEFAULT 0, PRIMARY KEY (`word`));')
 		tableList.append(base) #keep track of our additions
-	
+	#lock the tables. This is not a a transactional database, so this fluches the input buffer once.
+	#According to documentation at http://dev.mysql.com/doc/refman/5.0/en/insert-speed.html It should
+	# speed things up by 40%.
+	cursor.execute('LOCK TABLES `' + base + '` WRITE;') 
 	if not isRow(base, fol, db) :
 		cursor.execute('INSERT INTO `' + base + '` (`word`,`FirstFollowing`' +\
 			',`SecondFollowing`) VALUES ("' + fol + '",0,0);')
@@ -151,7 +155,7 @@ def insert(base, fol, twiceFol, db) :
 	
 	cursor.execute('UPDATE `' + base + '` SET SecondFollowing = ' + \
 		'SecondFollowing + 1 WHERE STRCMP(`word`,"' + twiceFol + '") = 0;')
-	
+	cursor.execute('UNLOCK TABLES;') #unlock that for other people
 	db.commit()
 	cursor.close()
 	
