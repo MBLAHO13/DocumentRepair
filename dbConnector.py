@@ -71,7 +71,7 @@ def openPidb(dbName) :
 	cursor.execute("SHOW TABLES")
 	global tableList
 	for table_name in cursor:
-		tableList.append(table_name[0])	
+		tableList.append((table_name[0]).encode("ascii","ignore"))	
 	return db
 
 
@@ -87,8 +87,10 @@ def isTable(base, db) :
 	"""
 	tableExists = False
 	
-	if unicode(base, "utf-8") in tableList: #check our bookeeping list
+	#if unicode(base, "utf-8") in tableList: #check our bookeeping list
+	if base in tableList:
 		return True
+
 	cursor = db.cursor()
 	cursor.execute('SELECT COUNT(*)FROM information_schema.tables WHERE ' + \
 		'table_schema = "' + str(db.database) + '" AND table_name = "' + \

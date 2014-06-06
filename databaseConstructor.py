@@ -113,7 +113,7 @@ def main() :
 					fileToDatabase(file, probabilitydb)
 			except IOError:
 				print "File " + x + " could not be opened.\n"
-			except OperationalError: 
+			except error.OperationalError: 
 				probabilitydb = db.openPidb(dbInput) # reconnect to the database
 				fileToDatabase(file, probabilitydb) #retry the failed book add
 			
